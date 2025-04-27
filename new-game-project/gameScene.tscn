@@ -1,0 +1,35 @@
+[gd_scene load_steps=7 format=3 uid="uid://bq0oaternv06m"]
+
+[ext_resource type="PackedScene" uid="uid://cjhlyda86hixo" path="res://player.tscn" id="1_q21n6"]
+[ext_resource type="PackedScene" uid="uid://dmm6ak4xisk65" path="res://Joy.tscn" id="2_cmwys"]
+[ext_resource type="PackedScene" uid="uid://dp0dqv45kqame" path="res://Bullet.tscn" id="2_v4rmi"]
+[ext_resource type="PackedScene" uid="uid://d25a00kka1vp" path="res://EnemySpawner.tscn" id="4_k1w36"]
+[ext_resource type="PackedScene" uid="uid://c1tgpg0obh5cw" path="res://Enemy.tscn" id="5_nbdpg"]
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_ff84h"]
+
+[node name="GameScene" type="Node2D"]
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+navigation_polygon = SubResource("NavigationPolygon_ff84h")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="NavigationRegion2D"]
+
+[node name="Player" parent="." node_paths=PackedStringArray("Joystick") groups=["Player"] instance=ExtResource("1_q21n6")]
+Speed = 200.0
+BulletScene = ExtResource("2_v4rmi")
+Joystick = NodePath("../Joy")
+
+[node name="Joy" parent="." instance=ExtResource("2_cmwys")]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_right = 0.0
+offset_left = 1.0
+offset_top = 504.0
+offset_right = 1.0
+offset_bottom = 504.0
+grow_horizontal = 1
+grow_vertical = 0
+
+[node name="EnemySpawner" parent="." instance=ExtResource("4_k1w36")]
+EnemyScene = ExtResource("5_nbdpg")
