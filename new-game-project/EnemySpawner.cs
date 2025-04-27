@@ -28,7 +28,7 @@ public partial class EnemySpawner : Node2D
 		_timer += (float)delta;
 		int currentEnemies = GetTree().GetNodesInGroup("Enemies").Count;
 		
-		GD.Print($"Timer: {_timer}, Enemies: {currentEnemies}"); // Debug
+		//GD.Print($"Timer: {_timer}, Enemies: {currentEnemies}"); // Debug
 
 		if (_timer >= SpawnInterval && currentEnemies < MaxEnemies)
 		{

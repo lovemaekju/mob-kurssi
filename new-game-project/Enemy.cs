@@ -4,9 +4,6 @@ using Shooter;
 public partial class Enemy : CharacterBody2D
 {
 	[Export] public float Speed = 80f;
-	[Export] public int Health = 3;
-	[Export] public float Damage = 1;
-	
 	private Player _target;
 	private Area2D _attackArea;
 
@@ -15,6 +12,7 @@ public partial class Enemy : CharacterBody2D
 		_target = player;
 		_attackArea = GetNode<Area2D>("AttackArea");
 		_attackArea.BodyEntered += OnAttackAreaEntered;
+		GD.Print("Enemy spawned at: ", GlobalPosition);
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -24,38 +22,25 @@ public partial class Enemy : CharacterBody2D
 			var direction = (_target.GlobalPosition - GlobalPosition).Normalized();
 			Velocity = direction * Speed;
 			MoveAndSlide();
-			
-			if (direction != Vector2.Zero)
-			{
-				Rotation = direction.Angle();
-			}
+			Rotation = direction.Angle();
 		}
 	}
 
-	public void TakeDamage(int amount)
-	{
-		Health -= amount;
-		
-		var sprite = GetNode<Sprite2D>("Sprite2D");
-		sprite.Modulate = Colors.Red;
-		GetTree().CreateTimer(0.1).Timeout += () => sprite.Modulate = Colors.White;
-		
-		if (Health <= 0) Die();
-	}
+public void TakeDamage(int damageAmount = 1)  // Now accepts parameter but ignores it
+{
+	GD.Print($"Enemy took damage (always dies in one hit)");
+	Die();
+}
 
 	private void Die()
 	{
+		// Spawn explosion effect
 		var explosion = GD.Load<PackedScene>("res://Effects/Explosion.tscn").Instantiate();
 		GetParent().AddChild(explosion);
 		
-		// Safe position setting
 		if (explosion is Node2D explosionNode)
 		{
 			explosionNode.GlobalPosition = GlobalPosition;
-		}
-		else
-		{
-			GD.PrintErr("Explosion scene root must be Node2D-derived!");
 		}
 		
 		QueueFree();
@@ -65,7 +50,7 @@ public partial class Enemy : CharacterBody2D
 	{
 		if (body is Player player)
 		{
-			player.TakeDamage((int)Damage);
+			player.TakeDamage(1); // Player takes damage when touching enemy
 		}
 	}
 }

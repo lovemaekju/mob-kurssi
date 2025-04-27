@@ -1,16 +1,31 @@
 using Godot;
-using System;
 using Shooter;
 
 public partial class Bullet : Area2D
 {
-	// Called when the node enters the scene tree for the first time.
+	[Export] public float Speed = 600f;
+	[Export] public int Damage = 1;
+	public Vector2 Direction { get; set; } = Vector2.Right; // Add this property
+	
 	public override void _Ready()
 	{
+		BodyEntered += OnBodyEntered;
 	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
+public override void _PhysicsProcess(double delta)
 	{
+		Position += Direction * Speed * (float)delta; // Use Direction instead of Transform.X
+	}
+	
+	private void OnBodyEntered(Node body)
+	{
+		GD.Print($"Bullet hit: {body.Name}");
+		
+		if (body is Enemy enemy)
+		{
+			enemy.TakeDamage(Damage);
+			GD.Print("Enemy hit confirmed!");
+		}
+		
+		QueueFree(); // Destroy bullet on any hit
 	}
 }
