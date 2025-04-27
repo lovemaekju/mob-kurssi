@@ -1,12 +1,22 @@
-[gd_scene load_steps=4 format=3 uid="uid://cjhlyda86hixo"]
+[gd_scene load_steps=5 format=3 uid="uid://cjhlyda86hixo"]
 
 [ext_resource type="Script" path="res://Player.cs" id="1_mvq7h"]
 [ext_resource type="PackedScene" uid="uid://dp0dqv45kqame" path="res://Bullet.tscn" id="2_klnry"]
 [ext_resource type="Texture2D" uid="uid://cuiwfxmpk24qr" path="res://icon.svg" id="2_wa6vl"]
 
-[node name="Player" type="Node2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_eeq67"]
+size = Vector2(126, 126)
+
+[node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_mvq7h")
 BulletScene = ExtResource("2_klnry")
+Health = 5
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_wa6vl")
+
+[node name="Hitbox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(-5, -1)
+shape = SubResource("RectangleShape2D_eeq67")
