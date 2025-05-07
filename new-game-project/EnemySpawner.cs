@@ -1,5 +1,5 @@
 using Godot;
-using System.Collections.Generic;
+using System.Linq;
 using Shooter;
 
 public partial class EnemySpawner : Node2D
@@ -13,22 +13,27 @@ public partial class EnemySpawner : Node2D
 
 	public override void _Ready()
 	{
-		_player = GetTree().GetFirstNodeInGroup("Player") as Player;
-		GD.Print("Player found: " + (_player != null)); // Debug
-
-		if (EnemyScene == null)
-			GD.PrintErr("EnemyScene not assigned in inspector!");
+		// Safer player lookup
+		RefreshPlayerReference();
 	}
 
 	public override void _Process(double delta)
 	{
-		if (_player == null || EnemyScene == null) 
-			return;
+		// 1. Refresh player reference if needed
+		if (!IsInstanceValid(_player))
+		{
+			RefreshPlayerReference();
+			if (_player == null) return; // No player exists
+		}
+
+		// 2. Other safety checks
+		if (EnemyScene == null) return;
 		
 		_timer += (float)delta;
-		int currentEnemies = GetTree().GetNodesInGroup("Enemies").Count;
 		
-		//GD.Print($"Timer: {_timer}, Enemies: {currentEnemies}"); // Debug
+		// 3. Safer enemy counting
+		int currentEnemies = GetTree().GetNodesInGroup("Enemies")
+			.Count(IsInstanceValid);
 
 		if (_timer >= SpawnInterval && currentEnemies < MaxEnemies)
 		{
@@ -37,17 +42,43 @@ public partial class EnemySpawner : Node2D
 		}
 	}
 
+private void RefreshPlayerReference()
+{
+	// Try multiple ways to find player
+	_player = GetTree().GetFirstNodeInGroup("Player") as Player;
+	
+	if (_player == null)
+	{
+		_player = GetNodeOrNull<Player>("/root/GameScene/Player");
+	}
+	
+	GD.Print("Player reference refreshed: " + (_player != null));
+	
+	// Debug: Print all nodes in "Player" group
+	GD.Print("Nodes in 'Player' group:", 
+		string.Join(", ", GetTree().GetNodesInGroup("Player").Select(n => n.Name)));
+}
+
 	private void SpawnEnemy()
 	{   
+		if (!IsInstanceValid(_player)) return;
+		
 		var enemy = EnemyScene.Instantiate<Enemy>();
 		GetParent().AddChild(enemy);
 		enemy.GlobalPosition = GetRandomPosition();
-		enemy.Initialize(_player);
-		GD.Print($"Spawned enemy at {enemy.GlobalPosition}"); // Debug
+		
+		// Pass player reference safely
+		if (IsInstanceValid(_player))
+		{
+			enemy.Initialize(_player);
+		}
+		GD.Print($"Spawned enemy at {enemy.GlobalPosition}");
 	}
 
 	private Vector2 GetRandomPosition()
 	{
+		if (!IsInstanceValid(_player)) return Vector2.Zero;
+		
 		float randomAngle = GD.Randf() * Mathf.Pi * 2;
 		float distance = GD.Randf() * 200f + 300f;
 		return _player.GlobalPosition + new Vector2(

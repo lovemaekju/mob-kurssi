@@ -12,11 +12,17 @@ public partial class Enemy : CharacterBody2D
 		_target = player;
 		_attackArea = GetNode<Area2D>("AttackArea");
 		_attackArea.BodyEntered += OnAttackAreaEntered;
+		player.TreeExiting += () => _target = null; 
 		GD.Print("Enemy spawned at: ", GlobalPosition);
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
+				if (!IsInstanceValid(_target))
+		{
+			// Handle missing target (e.g., wander or despawn)
+			return;
+		}
 		if (_target != null)
 		{
 			var direction = (_target.GlobalPosition - GlobalPosition).Normalized();
@@ -34,14 +40,6 @@ public void TakeDamage(int damageAmount = 1)  // Now accepts parameter but ignor
 
 	private void Die()
 	{
-		// Spawn explosion effect
-		var explosion = GD.Load<PackedScene>("res://Effects/Explosion.tscn").Instantiate();
-		GetParent().AddChild(explosion);
-		
-		if (explosion is Node2D explosionNode)
-		{
-			explosionNode.GlobalPosition = GlobalPosition;
-		}
 		
 		QueueFree();
 	}

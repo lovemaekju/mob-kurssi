@@ -17,7 +17,8 @@ public partial class VirtualJoystick : Control
 	public override void _Ready()
 	{
 		// Position at middle-left with some margin
-		Position = new Vector2(250, GetViewportRect().Size.Y / 2);
+		Position = new Vector2(100, GetViewportRect().Size.Y / 2 + 200);
+		
 		
 		_center = Size / 2;
 		_handlePosition = _center;

@@ -12,7 +12,8 @@ namespace Shooter
 		[Export] public float ShootCooldown = 0.3f;
 		[Export] public int Health = 100;
 		[Export] public float InvincibilityTime = 0.5f;
-		
+		[Signal]
+		public delegate void DamageTakenEventHandler(int currentHealth);
 		
 		// State
 		private Vector2 _currentVelocity;
@@ -25,6 +26,7 @@ namespace Shooter
 
 		public override void _Ready()
 		{
+			AddToGroup("Player");
 			_playerSprite = GetNode<Sprite2D>("Sprite2D");
 			_hitbox = GetNode<Area2D>("Hitbox");
 			_hitbox.BodyEntered += OnHitboxBodyEntered;
@@ -62,9 +64,9 @@ namespace Shooter
 			if (!_alive || _invincible) return;
 			
 			Health -= damage;
-			GD.Print($"Player took {damage} damage! Health: {Health}");
-			//HealthChanged?.Invoke(Health); // This notifies the GameManager
+			
 			_playerSprite.Modulate = Colors.Red;
+			 EmitSignal(SignalName.DamageTaken, Health);
 			GetTree().CreateTimer(0.1f).Timeout += () => _playerSprite.Modulate = Colors.White;
 			
 			if (Health <= 0) Die();
@@ -74,20 +76,20 @@ namespace Shooter
 		{
 			if (!_alive) return;
 			
-			_alive = false;
-			GD.Print("Player died!");
-			
-			var explosion = GD.Load<PackedScene>("res://Effects/Explosion.tscn").Instantiate();
-			GetParent().AddChild(explosion);
-			
-			if (explosion is Node2D explosionNode)
-			{
-				explosionNode.GlobalPosition = GlobalPosition;
-			}
-			
+			_alive = false;		
 			_playerSprite.Visible = false;
 			GetTree().CreateTimer(1.0f).Timeout += () => QueueFree();
 		}
+		private void ClampToViewport()
+{
+	Rect2 viewportRect = GetViewport().GetVisibleRect();
+	Vector2 margin = GetNode<CollisionShape2D>("CollisionShape2D").Shape.GetRect().Size / 2;
+	
+	Position = new Vector2(
+		Mathf.Clamp(Position.X, margin.X, viewportRect.Size.X - margin.X),
+		Mathf.Clamp(Position.Y, margin.Y, viewportRect.Size.Y - margin.Y)
+	);
+}
 
 		public override void _Input(InputEvent @event)
 		{
@@ -104,6 +106,7 @@ namespace Shooter
 
 		public override void _Process(double delta)
 		{
+			ClampToViewport();
 			if (!_alive) return;
 			
 			float deltaFloat = (float)delta;
@@ -136,7 +139,6 @@ namespace Shooter
 			var bullet = BulletScene.Instantiate() as Bullet;
 			if (bullet == null)
 			{
-				GD.PrintErr("Instantiated object is not a Bullet!");
 				return;
 			}
 
@@ -144,7 +146,6 @@ namespace Shooter
 			bullet.GlobalPosition = GlobalPosition;
 			bullet.Direction = shootDirection;
 			
-			GD.Print($"Bullet spawned at {GlobalPosition} with direction {shootDirection}");
 			
 			_playerSprite.Modulate = Colors.Yellow;
 			GetTree().CreateTimer(0.1f).Timeout += () => _playerSprite.Modulate = Colors.White;

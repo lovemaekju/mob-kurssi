@@ -1,19 +1,38 @@
-[gd_scene load_steps=5 format=3 uid="uid://cjhlyda86hixo"]
+[gd_scene load_steps=6 format=3 uid="uid://cjhlyda86hixo"]
 
 [ext_resource type="Script" path="res://Player.cs" id="1_mvq7h"]
 [ext_resource type="PackedScene" uid="uid://dp0dqv45kqame" path="res://Bullet.tscn" id="2_klnry"]
-[ext_resource type="Texture2D" uid="uid://cuiwfxmpk24qr" path="res://icon.svg" id="2_wa6vl"]
+[ext_resource type="Texture2D" uid="uid://86b5ssvgc5ab" path="res://Assets/player.png" id="3_6e8ok"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mj2bm"]
+size = Vector2(115, 121)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eeq67"]
 size = Vector2(126, 126)
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_mvq7h")
+Speed = 400.0
 BulletScene = ExtResource("2_klnry")
 Health = 5
 
+[node name="Sprite2D2" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 0, 0.0784314)
+light_mask = 0
+texture_filter = 1
+position = Vector2(7, 5)
+scale = Vector2(3.6875, 3.6875)
+texture = ExtResource("3_6e8ok")
+
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_wa6vl")
+light_mask = 0
+texture_filter = 1
+scale = Vector2(3.6875, 3.6875)
+texture = ExtResource("3_6e8ok")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-2.5, -0.5)
+shape = SubResource("RectangleShape2D_mj2bm")
 
 [node name="Hitbox" type="Area2D" parent="."]
 
