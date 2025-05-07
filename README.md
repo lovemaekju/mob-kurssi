@@ -6,9 +6,16 @@ Move and aim with joystick and shoot enemies by tapping on the screen
 
 Try to collect as many coins as possible without running out of HP
 
+[Gameplay demo](https://www.youtube.com/watch?v=wwAqVcdmnB0)
+
+
 <h2>Download</h2>
 
 [APK BUILD](https://github.com/lovemaekju/mob-kurssi/raw/refs/heads/main/Build/BitShooter.apk)
+
+<h2>Compatibility</h2>
+
+Tested on OnePlus 9 running Android 14
 
 <h2>Credits</h2>
 Art, Music & Code - @lovemaekju
